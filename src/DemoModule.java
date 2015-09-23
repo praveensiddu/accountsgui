@@ -32,6 +32,7 @@
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.util.MissingResourceException;
 
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
@@ -81,16 +82,15 @@ public class DemoModule extends JApplet {
 	public static Dimension HGAP30 = new Dimension(30, 1);
 	public static Dimension VGAP30 = new Dimension(1, 30);
 
-	private CPAPowerTool swingset = null;
 	private JPanel panel = null;
 	private String resourceName = null;
 	private String iconPath = null;
 
-	public DemoModule(CPAPowerTool swingset) {
-		this(swingset, null, null);
+	public DemoModule() {
+		this(null, null);
 	}
 
-	public DemoModule(CPAPowerTool swingset, String resourceName,
+	public DemoModule(String resourceName,
 			String iconPath) {
 		UIManager.put("swing.boldMetal", Boolean.FALSE);
 		panel = new JPanel();
@@ -98,7 +98,6 @@ public class DemoModule extends JApplet {
 
 		this.resourceName = resourceName;
 		this.iconPath = iconPath;
-		this.swingset = swingset;
 
 	}
 
@@ -110,23 +109,35 @@ public class DemoModule extends JApplet {
 		return panel;
 	}
 
-	public CPAPowerTool getSwingSet2() {
-		return swingset;
-	}
-
+	
+	/**
+	 * This method returns a string from the demo's resource bundle.
+	 */
 	public String getString(String key) {
-
-		if (getSwingSet2() != null) {
-			return getSwingSet2().getString(key);
-		} else {
+		String value = null;
+		try {
+			value = TextAndMnemonicUtils.getTextAndMnemonicString(key);
+		} catch (MissingResourceException e) {
+			System.out
+					.println("java.util.MissingResourceException: Couldn't find value for: "
+							+ key);
+		}
+		if (value == null) {
+			value = "Could not find resource: " + key + "  ";
 			return "nada";
 		}
+		return value;
 	}
+
 
 	public char getMnemonic(String key) {
 		return (getString(key)).charAt(0);
 	}
-
+	public ImageIcon createImageIcon(String filename, String description) {
+		String path = "/resources/images/" + filename;
+		return new ImageIcon(getClass().getResource(path));
+	}
+	/*
 	public ImageIcon createImageIcon(String filename, String description) {
 		if (getSwingSet2() != null) {
 			return getSwingSet2().createImageIcon(filename, description);
@@ -135,6 +146,7 @@ public class DemoModule extends JApplet {
 			return new ImageIcon(getClass().getResource(path), description);
 		}
 	}
+	*/
 
 	public String getName() {
 		return getString(getResourceName() + ".name");
@@ -181,7 +193,7 @@ public class DemoModule extends JApplet {
 	}
 
 	public static void main(String[] args) {
-		DemoModule demo = new DemoModule(null);
+		DemoModule demo = new DemoModule();
 		demo.mainImpl();
 	}
 

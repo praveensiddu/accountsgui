@@ -69,17 +69,17 @@ public class TabbedPaneDemo extends DemoModule implements ActionListener {
 	 * main method allows us to run as a standalone demo.
 	 */
 	public static void main(String[] args) {
-		TabbedPaneDemo demo = new TabbedPaneDemo(null);
+		TabbedPaneDemo demo = new TabbedPaneDemo();
 		demo.mainImpl();
 	}
 
 	/**
 	 * TabbedPaneDemo Constructor
 	 */
-	public TabbedPaneDemo(CPAPowerTool swingset) {
+	public TabbedPaneDemo() {
 		// Set the title for this demo, and an icon used to represent this
 		// demo inside the SwingSet2 app.
-		super(swingset, "TabbedPaneDemo", "toolbar/JTabbedPane.gif");
+		super( "TabbedPaneDemo", "toolbar/JTabbedPane.gif");
 
 		// create tab position controls
 		JPanel tabControls = new JPanel();

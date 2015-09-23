@@ -55,17 +55,17 @@ public class TreeDemo extends DemoModule {
 	 * main method allows us to run as a standalone demo.
 	 */
 	public static void main(String[] args) {
-		TreeDemo demo = new TreeDemo(null);
+		TreeDemo demo = new TreeDemo();
 		demo.mainImpl();
 	}
 
 	/**
 	 * TreeDemo Constructor
 	 */
-	public TreeDemo(CPAPowerTool swingset) {
+	public TreeDemo() {
 		// Set the title for this demo, and an icon used to represent this
 		// demo inside the SwingSet2 app.
-		super(swingset, "TreeDemo", "toolbar/JTree.gif");
+		super( "TreeDemo", "toolbar/JTree.gif");
 
 		getDemoPanel().add(createTree(), BorderLayout.CENTER);
 	}

@@ -125,15 +125,15 @@ public class TableDemo extends DemoModule {
 	 * main method allows us to run as a standalone demo.
 	 */
 	public static void main(String[] args) {
-		TableDemo demo = new TableDemo(null);
+		TableDemo demo = new TableDemo();
 		demo.mainImpl();
 	}
 
 	/**
 	 * TableDemo Constructor
 	 */
-	public TableDemo(CPAPowerTool swingset) {
-		super(swingset, "TableDemo", "toolbar/JTable.gif");
+	public TableDemo() {
+		super( "TableDemo", "toolbar/JTable.gif");
 
 		getDemoPanel().setLayout(new BorderLayout());
 		controlPanel = new JPanel();

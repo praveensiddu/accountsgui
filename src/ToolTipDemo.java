@@ -51,17 +51,17 @@ public class ToolTipDemo extends DemoModule {
 	 * main method allows us to run as a standalone demo.
 	 */
 	public static void main(String[] args) {
-		ToolTipDemo demo = new ToolTipDemo(null);
+		ToolTipDemo demo = new ToolTipDemo();
 		demo.mainImpl();
 	}
 
 	/**
 	 * ToolTipDemo Constructor
 	 */
-	public ToolTipDemo(CPAPowerTool swingset) {
+	public ToolTipDemo() {
 		// Set the title for this demo, and an icon used to represent this
 		// demo inside the SwingSet2 app.
-		super(swingset, "ToolTipDemo", "toolbar/ToolTip.gif");
+		super("ToolTipDemo", "toolbar/ToolTip.gif");
 
 		// Set the layout manager.
 		JPanel p = getDemoPanel();

@@ -4,8 +4,10 @@ import java.util.Date;
 import java.util.List;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.embed.swing.JFXPanel;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -30,7 +32,7 @@ import data.RealProperty;
 public class TableViewSample extends Application {
 
 	private TableView<RealProperty> table = new TableView<RealProperty>();
-	private static ObservableList<RealProperty> data;
+	private ObservableList<RealProperty> data;
 	final HBox hb = new HBox();
 	private static List<RealProperty> rpL;
 
@@ -45,18 +47,31 @@ public class TableViewSample extends Application {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		data = FXCollections.observableArrayList(rpL);
 		launch(args);
 	}
+	
 
-	@Override
-	public void start(Stage stage) {
+    private static void initAndShowGUI(JFXPanel jfxPanel) {
+
+
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+            	TableViewSample tvs = new TableViewSample();
+                Scene scene = tvs.createScene(rpL);
+                jfxPanel.setScene(scene);
+            }
+        });
+    }
+
+
+    
+	public Scene createScene(List<RealProperty> rpList)
+	{
+		data = FXCollections.observableArrayList(rpList);
 		Scene scene = new Scene(new Group());
-		stage.setTitle("Table View Sample");
-		stage.setWidth(950);
-		stage.setHeight(550);
 
-		final Label label = new Label("Address Book");
+		final Label label = new Label("Summary:");
 		label.setFont(new Font("Arial", 20));
 
 		Callback<TableColumn, TableCell> numericFactory = new Callback<TableColumn, TableCell>() {
@@ -107,9 +122,9 @@ public class TableViewSample extends Application {
 						"landValue"));
 		landValueCol.setCellFactory(numericFactory);
 		landValueCol
-				.setOnEditCommit(new EventHandler<CellEditEvent<RealProperty, Integer>>() {
+				.setOnEditCommit(new EventHandler<CellEditEvent<RealProperty, Long>>() {
 					@Override
-					public void handle(CellEditEvent<RealProperty, Integer> t) {
+					public void handle(CellEditEvent<RealProperty, Long> t) {
 						((RealProperty) t.getTableView().getItems()
 								.get(t.getTablePosition().getRow()))
 								.setLandValue(t.getNewValue().intValue());
@@ -121,9 +136,9 @@ public class TableViewSample extends Application {
 		costCol.setCellValueFactory(new PropertyValueFactory<RealProperty, String>(
 				"cost"));
 		costCol.setCellFactory(numericFactory);
-		costCol.setOnEditCommit(new EventHandler<CellEditEvent<RealProperty, Integer>>() {
+		costCol.setOnEditCommit(new EventHandler<CellEditEvent<RealProperty, Long>>() {
 			@Override
-			public void handle(CellEditEvent<RealProperty, Integer> t) {
+			public void handle(CellEditEvent<RealProperty, Long> t) {
 				((RealProperty) t.getTableView().getItems()
 						.get(t.getTablePosition().getRow())).setCost(t
 						.getNewValue().intValue());
@@ -137,9 +152,9 @@ public class TableViewSample extends Application {
 						"renovation"));
 		renovationCol.setCellFactory(numericFactory);
 		renovationCol
-				.setOnEditCommit(new EventHandler<CellEditEvent<RealProperty, Integer>>() {
+				.setOnEditCommit(new EventHandler<CellEditEvent<RealProperty, Long>>() {
 					@Override
-					public void handle(CellEditEvent<RealProperty, Integer> t) {
+					public void handle(CellEditEvent<RealProperty, Long> t) {
 						((RealProperty) t.getTableView().getItems()
 								.get(t.getTablePosition().getRow()))
 								.setRenovation(t.getNewValue().intValue());
@@ -153,9 +168,9 @@ public class TableViewSample extends Application {
 						"loanClosingCost"));
 		loanClosingCostCol.setCellFactory(numericFactory);
 		loanClosingCostCol
-				.setOnEditCommit(new EventHandler<CellEditEvent<RealProperty, Integer>>() {
+				.setOnEditCommit(new EventHandler<CellEditEvent<RealProperty, Long>>() {
 					@Override
-					public void handle(CellEditEvent<RealProperty, Integer> t) {
+					public void handle(CellEditEvent<RealProperty, Long> t) {
 						((RealProperty) t.getTableView().getItems()
 								.get(t.getTablePosition().getRow()))
 								.setLoanClosingCost(t.getNewValue().intValue());
@@ -213,6 +228,16 @@ public class TableViewSample extends Application {
 		vbox.getChildren().addAll(label, table, hb);
 
 		((Group) scene.getRoot()).getChildren().addAll(vbox);
+		return scene;
+
+	}
+
+	@Override
+	public void start(Stage stage) {
+		Scene scene = createScene(rpL);
+		stage.setTitle("Table View Sample");
+		stage.setWidth(950);
+		stage.setHeight(550);
 
 		stage.setScene(scene);
 		stage.show();

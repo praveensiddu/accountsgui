@@ -166,12 +166,12 @@ public class RealProperties extends DemoModule {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		RealProperties demo = new RealProperties(null);
+		RealProperties demo = new RealProperties();
 		demo.mainImpl();
 	}
 
-	public RealProperties(CPAPowerTool swingset) {
-		super(swingset, "RealProperties", "toolbar/JTable.gif");
+	public RealProperties() {
+		super( "RealProperties", "toolbar/JTable.gif");
 
 		getDemoPanel().setLayout(new BorderLayout());
 		controlPanel = new JPanel();
