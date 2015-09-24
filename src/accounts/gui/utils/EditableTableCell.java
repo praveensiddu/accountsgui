@@ -1,3 +1,4 @@
+package accounts.gui.utils;
 public class EditableTableCell<S extends Object, T extends String> extends
 		AbstractEditableTableCell<S, T> {
 	public EditableTableCell() {

@@ -1,4 +1,4 @@
-package data;
+package accounts.data;
 
 import java.util.Date;
 

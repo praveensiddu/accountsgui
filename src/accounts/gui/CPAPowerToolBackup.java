@@ -29,7 +29,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
+package accounts.gui;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
@@ -92,7 +92,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.metal.MetalTheme;
 
-import data.RealProperty;
+import accounts.data.RealProperty;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
 
@@ -101,18 +101,16 @@ import javafx.scene.Scene;
  *
  * @author Jeff Dinkins
  */
-public class CPAPowerTool extends JPanel {
+public class CPAPowerToolBackup extends JPanel {
 
 	String[] demos = { "TabbedPaneDemo", "ToolTipDemo", "TreeDemo" };
 
-	/*
 	void loadDemos() {
 		for (int i = 0; i < demos.length;) {
 			loadDemo(demos[i]);
 			i++;
 		}
 	}
-	*/
 
 	// Possible Look & Feels
 	private static final String windows = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
@@ -174,14 +172,14 @@ public class CPAPowerTool extends JPanel {
 	// keep track of the number of SwingSets created - we only want to exit
 	// the program when the last one has been closed.
 	private static int numSSs = 0;
-	private static Vector<CPAPowerTool> swingSets = new Vector<CPAPowerTool>();
+	private static Vector<CPAPowerToolBackup> swingSets = new Vector<CPAPowerToolBackup>();
 
 	private boolean dragEnabled = true;
 
 	/**
 	 * SwingSet2 Constructor
 	 */
-	public CPAPowerTool(GraphicsConfiguration gc) {
+	public CPAPowerToolBackup(GraphicsConfiguration gc) {
 
 		currentLookAndFeel = UIManager.getLookAndFeel().getClass().getName();
 
@@ -221,14 +219,14 @@ public class CPAPowerTool extends JPanel {
 			System.exit(-1);
 		}
 		try {
-			rpL = RealProperties.parsePropFile(args[0]);
+			rpL = RealPropertiesSwingTable.parsePropFile(args[0]);
 		} catch (IOException | ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		// Create SwingSet on the default monitor
 		UIManager.put("swing.boldMetal", Boolean.FALSE);
-		CPAPowerTool swingset = new CPAPowerTool(GraphicsEnvironment
+		CPAPowerToolBackup swingset = new CPAPowerToolBackup(GraphicsEnvironment
 				.getLocalGraphicsEnvironment().getDefaultScreenDevice()
 				.getDefaultConfiguration());
 
@@ -241,7 +239,7 @@ public class CPAPowerTool extends JPanel {
 	public void initializeDemo() {
 		JPanel top = new JPanel();
 		top.setLayout(new BorderLayout());
-		//add(top, BorderLayout.NORTH);
+		add(top, BorderLayout.NORTH);
 
 		menuBar = createMenus();
 
@@ -270,28 +268,21 @@ public class CPAPowerTool extends JPanel {
 		demoPanel.setBorder(new EtchedBorder());
 		tabbedPane.addTab("Hi There!", demoPanel);
 		
-		JFXPanel propertiesJfxPanel = new JFXPanel();
+		JFXPanel jfxPanel = new JFXPanel();
 		TableViewSample tvs = new TableViewSample();
-		Scene sceneProperties = tvs.createScene(rpL);
-		propertiesJfxPanel.setScene(sceneProperties);
+		Scene scene = tvs.createScene(rpL);
+		jfxPanel.setScene(scene);
+
+		// demoSrcPane = new JEditorPane("text/html",
+		// getString("SourceCode.loading"));
+		// demoSrcPane.setEditable(false);
+		TreeDemo td = new TreeDemo();
+
+		JScrollPane scroller = new JScrollPane();
+		scroller.getViewport().add(td);
 
 		tabbedPane.addTab(getString("TabbedPane.properties_label"), null,
-				propertiesJfxPanel, getString("TabbedPane.properties_tooltip"));
-		
-
-		JFXPanel statementsJfxPanel = new JFXPanel();
-		TableViewSample tvs1 = new TableViewSample();
-		Scene sceneStatements = tvs1.createScene(rpL);
-		statementsJfxPanel.setScene(sceneStatements);
-
-		tabbedPane.addTab(getString("TabbedPane.statements_label"), null,
-				statementsJfxPanel, getString("TabbedPane.statements_tooltip"));
-		
-
-		JFXPanel taxReportJfxPanel = new JFXPanel();
-
-		tabbedPane.addTab(getString("TabbedPane.taxreport_label"), null,
-				taxReportJfxPanel, getString("TabbedPane.taxreport_tooltip"));
+				jfxPanel, getString("TabbedPane.properties_tooltip"));
 
 	}
 
@@ -602,7 +593,7 @@ public class CPAPowerTool extends JPanel {
 	 * that we can get SwingSet2 up and available to the user quickly.
 	 */
 	public void preloadFirstDemo() {
-		DemoModule demo = addDemo(new TabbedPaneDemo());
+		DemoModule demo = addDemo(new TableDemo());
 		setDemo(demo);
 	}
 
@@ -693,7 +684,9 @@ public class CPAPowerTool extends JPanel {
 	// ****************** Utility Methods ********************
 	// *******************************************************
 
-	/*
+	/**
+	 * Loads a demo from a classname
+	 */
 	void loadDemo(String classname) {
 		setStatus(getString("Status.loading") + getString(classname + ".name"));
 		DemoModule demo = null;
@@ -708,7 +701,6 @@ public class CPAPowerTool extends JPanel {
 			System.out.println("Error occurred loading demo: " + classname);
 		}
 	}
-	*/
 
 	/**
 	 * A utility function that layers on top of the LookAndFeel's
@@ -903,7 +895,7 @@ public class CPAPowerTool extends JPanel {
 		try {
 			UIManager.setLookAndFeel(currentLookAndFeel);
 
-			for (CPAPowerTool ss : swingSets) {
+			for (CPAPowerToolBackup ss : swingSets) {
 				ss.updateThisSwingSet();
 			}
 		} catch (Exception ex) {
@@ -979,10 +971,10 @@ public class CPAPowerTool extends JPanel {
 	 * this class the two "must haves" needed in most runnables for this demo.
 	 */
 	class SwingSetRunnable implements Runnable {
-		protected CPAPowerTool swingset;
+		protected CPAPowerToolBackup swingset;
 		protected Object obj;
 
-		public SwingSetRunnable(CPAPowerTool swingset, Object obj) {
+		public SwingSetRunnable(CPAPowerToolBackup swingset, Object obj) {
 			this.swingset = swingset;
 			this.obj = obj;
 		}
@@ -996,10 +988,10 @@ public class CPAPowerTool extends JPanel {
 	// *******************************************************
 
 	public class SwitchToDemoAction extends AbstractAction {
-		CPAPowerTool swingset;
+		CPAPowerToolBackup swingset;
 		DemoModule demo;
 
-		public SwitchToDemoAction(CPAPowerTool swingset, DemoModule demo) {
+		public SwitchToDemoAction(CPAPowerToolBackup swingset, DemoModule demo) {
 			super(demo.getName(), demo.getIcon());
 			this.swingset = swingset;
 			this.demo = demo;
@@ -1024,10 +1016,10 @@ public class CPAPowerTool extends JPanel {
 	}
 
 	class ChangeLookAndFeelAction extends AbstractAction {
-		CPAPowerTool swingset;
+		CPAPowerToolBackup swingset;
 		String laf;
 
-		protected ChangeLookAndFeelAction(CPAPowerTool swingset, String laf) {
+		protected ChangeLookAndFeelAction(CPAPowerToolBackup swingset, String laf) {
 			super("ChangeTheme");
 			this.swingset = swingset;
 			this.laf = laf;
@@ -1039,10 +1031,10 @@ public class CPAPowerTool extends JPanel {
 	}
 
 	class ActivatePopupMenuAction extends AbstractAction {
-		CPAPowerTool swingset;
+		CPAPowerToolBackup swingset;
 		JPopupMenu popup;
 
-		protected ActivatePopupMenuAction(CPAPowerTool swingset,
+		protected ActivatePopupMenuAction(CPAPowerToolBackup swingset,
 				JPopupMenu popup) {
 			super("ActivatePopupMenu");
 			this.swingset = swingset;
@@ -1059,9 +1051,9 @@ public class CPAPowerTool extends JPanel {
 
 	// Turns on all possible auditory feedback
 	class OnAudioAction extends AbstractAction {
-		CPAPowerTool swingset;
+		CPAPowerToolBackup swingset;
 
-		protected OnAudioAction(CPAPowerTool swingset) {
+		protected OnAudioAction(CPAPowerToolBackup swingset) {
 			super("Audio On");
 			this.swingset = swingset;
 		}
@@ -1075,9 +1067,9 @@ public class CPAPowerTool extends JPanel {
 
 	// Turns on the default amount of auditory feedback
 	class DefaultAudioAction extends AbstractAction {
-		CPAPowerTool swingset;
+		CPAPowerToolBackup swingset;
 
-		protected DefaultAudioAction(CPAPowerTool swingset) {
+		protected DefaultAudioAction(CPAPowerToolBackup swingset) {
 			super("Audio Default");
 			this.swingset = swingset;
 		}
@@ -1091,9 +1083,9 @@ public class CPAPowerTool extends JPanel {
 
 	// Turns off all possible auditory feedback
 	class OffAudioAction extends AbstractAction {
-		CPAPowerTool swingset;
+		CPAPowerToolBackup swingset;
 
-		protected OffAudioAction(CPAPowerTool swingset) {
+		protected OffAudioAction(CPAPowerToolBackup swingset) {
 			super("Audio Off");
 			this.swingset = swingset;
 		}
@@ -1125,17 +1117,17 @@ public class CPAPowerTool extends JPanel {
 		public void actionPerformed(ActionEvent e) {
 			boolean dragEnabled = ((JCheckBoxMenuItem) e.getSource())
 					.isSelected();
-			for (CPAPowerTool ss : swingSets) {
+			for (CPAPowerToolBackup ss : swingSets) {
 				ss.setDragEnabled(dragEnabled);
 			}
 		}
 	}
 
 	class ChangeThemeAction extends AbstractAction {
-		CPAPowerTool swingset;
+		CPAPowerToolBackup swingset;
 		MetalTheme theme;
 
-		protected ChangeThemeAction(CPAPowerTool swingset, MetalTheme theme) {
+		protected ChangeThemeAction(CPAPowerToolBackup swingset, MetalTheme theme) {
 			super("ChangeTheme");
 			this.swingset = swingset;
 			this.theme = theme;
@@ -1148,9 +1140,9 @@ public class CPAPowerTool extends JPanel {
 	}
 
 	class ExitAction extends AbstractAction {
-		CPAPowerTool swingset;
+		CPAPowerToolBackup swingset;
 
-		protected ExitAction(CPAPowerTool swingset) {
+		protected ExitAction(CPAPowerToolBackup swingset) {
 			super("ExitAction");
 			this.swingset = swingset;
 		}
@@ -1161,9 +1153,9 @@ public class CPAPowerTool extends JPanel {
 	}
 
 	class AboutAction extends AbstractAction {
-		CPAPowerTool swingset;
+		CPAPowerToolBackup swingset;
 
-		protected AboutAction(CPAPowerTool swingset) {
+		protected AboutAction(CPAPowerToolBackup swingset) {
 			super("AboutAction");
 			this.swingset = swingset;
 		}
@@ -1201,7 +1193,7 @@ public class CPAPowerTool extends JPanel {
 		static final int ALL_SCREENS = -1;
 		int screen;
 
-		protected MultiScreenAction(CPAPowerTool swingset, int screen) {
+		protected MultiScreenAction(CPAPowerToolBackup swingset, int screen) {
 			super("MultiScreenAction");
 			this.screen = screen;
 		}
@@ -1211,12 +1203,12 @@ public class CPAPowerTool extends JPanel {
 					.getLocalGraphicsEnvironment().getScreenDevices();
 			if (screen == ALL_SCREENS) {
 				for (int i = 0; i < gds.length; i++) {
-					CPAPowerTool swingset = new CPAPowerTool(
+					CPAPowerToolBackup swingset = new CPAPowerToolBackup(
 							gds[i].getDefaultConfiguration());
 					swingset.setDragEnabled(dragEnabled);
 				}
 			} else {
-				CPAPowerTool swingset = new CPAPowerTool(
+				CPAPowerToolBackup swingset = new CPAPowerToolBackup(
 						gds[screen].getDefaultConfiguration());
 				swingset.setDragEnabled(dragEnabled);
 			}
@@ -1228,22 +1220,22 @@ public class CPAPowerTool extends JPanel {
 	// *******************************************************
 
 	class DemoLoadThread extends Thread {
-		CPAPowerTool swingset;
+		CPAPowerToolBackup swingset;
 
-		public DemoLoadThread(CPAPowerTool swingset) {
+		public DemoLoadThread(CPAPowerToolBackup swingset) {
 			this.swingset = swingset;
 		}
 
 		public void run() {
-			//swingset.loadDemos();
+			swingset.loadDemos();
 		}
 	}
 
 	class AboutPanel extends JPanel {
 		ImageIcon aboutimage = null;
-		CPAPowerTool swingset = null;
+		CPAPowerToolBackup swingset = null;
 
-		public AboutPanel(CPAPowerTool swingset) {
+		public AboutPanel(CPAPowerToolBackup swingset) {
 			this.swingset = swingset;
 			aboutimage = swingset.createImageIcon("About.jpg",
 					"AboutBox.accessible_description");

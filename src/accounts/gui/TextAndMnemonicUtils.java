@@ -28,7 +28,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
+package accounts.gui;
 import java.io.IOException;
 import java.util.Properties;
 import java.util.ResourceBundle;
@@ -64,7 +64,7 @@ public class TextAndMnemonicUtils {
 	private static Properties properties = null;
 
 	static {
-		bundle = ResourceBundle.getBundle("resources.swingset");
+		bundle = ResourceBundle.getBundle("accounts.gui.resources.swingset");
 		properties = new Properties();
 		try {
 			properties.load(TextAndMnemonicUtils.class

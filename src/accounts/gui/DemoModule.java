@@ -29,7 +29,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
+package accounts.gui;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.util.MissingResourceException;
@@ -134,7 +134,7 @@ public class DemoModule extends JApplet {
 		return (getString(key)).charAt(0);
 	}
 	public ImageIcon createImageIcon(String filename, String description) {
-		String path = "/resources/images/" + filename;
+		String path = "resources/images/" + filename;
 		return new ImageIcon(getClass().getResource(path));
 	}
 	/*

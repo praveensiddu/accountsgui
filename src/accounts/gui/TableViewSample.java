@@ -1,8 +1,11 @@
+package accounts.gui;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 
+import accounts.data.RealProperty;
+import accounts.gui.utils.EditableTableCell;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -27,7 +30,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Callback;
-import data.RealProperty;
 
 public class TableViewSample extends Application {
 
@@ -42,7 +44,7 @@ public class TableViewSample extends Application {
 			System.exit(-1);
 		}
 		try {
-			rpL = RealProperties.parsePropFile(args[0]);
+			rpL = RealPropertiesSwingTable.parsePropFile(args[0]);
 		} catch (IOException | ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

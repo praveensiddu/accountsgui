@@ -29,7 +29,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
+package accounts.gui;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
@@ -45,6 +45,7 @@ import javax.swing.JPanel;
  *
  * @author Jeff Dinkins
  */
+
 public class ToolTipDemo extends DemoModule {
 
 	/**

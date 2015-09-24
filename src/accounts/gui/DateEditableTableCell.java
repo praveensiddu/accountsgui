@@ -1,7 +1,10 @@
+package accounts.gui;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import accounts.gui.utils.AbstractEditableTableCell;
 
 public class DateEditableTableCell<S extends Object, T extends Date> extends
 		AbstractEditableTableCell<S, T> {

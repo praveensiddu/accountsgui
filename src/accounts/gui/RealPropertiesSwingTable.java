@@ -29,7 +29,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
+package accounts.gui;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
@@ -74,9 +74,10 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
-import data.RealProperty;
+import accounts.data.RealProperty;
 
-public class RealProperties extends DemoModule {
+
+public class RealPropertiesSwingTable extends DemoModule {
 	JTable tableView;
 	JScrollPane scrollpane;
 	Dimension origin = new Dimension(0, 0);
@@ -96,7 +97,6 @@ public class RealProperties extends DemoModule {
 	JPanel controlPanel;
 	JScrollPane tableAggregate;
 
-	String path = "ImageClub/food/";
 
 	final int INITIAL_ROWHEIGHT = 33;
 	private static List<RealProperty> rpL;
@@ -166,11 +166,11 @@ public class RealProperties extends DemoModule {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		RealProperties demo = new RealProperties();
+		RealPropertiesSwingTable demo = new RealPropertiesSwingTable();
 		demo.mainImpl();
 	}
 
-	public RealProperties() {
+	public RealPropertiesSwingTable() {
 		super( "RealProperties", "toolbar/JTable.gif");
 
 		getDemoPanel().setLayout(new BorderLayout());

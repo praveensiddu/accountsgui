@@ -1,7 +1,9 @@
-
+package accounts.gui;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.ParsePosition;
+
+import accounts.gui.utils.AbstractEditableTableCell;
 
 /**
  *
