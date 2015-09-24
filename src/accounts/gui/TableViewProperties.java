@@ -6,6 +6,7 @@ import java.util.List;
 
 import accounts.data.RealProperty;
 import accounts.gui.utils.EditableTableCell;
+import accounts.gui.utils.FileUtils;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -31,7 +32,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
-public class TableViewSample extends Application {
+public class TableViewProperties extends Application {
 
 	private TableView<RealProperty> table = new TableView<RealProperty>();
 	private ObservableList<RealProperty> data;
@@ -44,7 +45,7 @@ public class TableViewSample extends Application {
 			System.exit(-1);
 		}
 		try {
-			rpL = RealPropertiesSwingTable.parsePropFile(args[0]);
+			rpL = FileUtils.parsePropFile(args[0]);
 		} catch (IOException | ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -59,7 +60,7 @@ public class TableViewSample extends Application {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-            	TableViewSample tvs = new TableViewSample();
+            	TableViewProperties tvs = new TableViewProperties();
                 Scene scene = tvs.createScene(rpL);
                 jfxPanel.setScene(scene);
             }

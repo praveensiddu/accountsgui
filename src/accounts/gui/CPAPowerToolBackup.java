@@ -93,6 +93,7 @@ import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.metal.MetalTheme;
 
 import accounts.data.RealProperty;
+import accounts.gui.utils.FileUtils;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
 
@@ -219,7 +220,7 @@ public class CPAPowerToolBackup extends JPanel {
 			System.exit(-1);
 		}
 		try {
-			rpL = RealPropertiesSwingTable.parsePropFile(args[0]);
+			rpL = FileUtils.parsePropFile(args[0]);
 		} catch (IOException | ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -269,7 +270,7 @@ public class CPAPowerToolBackup extends JPanel {
 		tabbedPane.addTab("Hi There!", demoPanel);
 		
 		JFXPanel jfxPanel = new JFXPanel();
-		TableViewSample tvs = new TableViewSample();
+		TableViewProperties tvs = new TableViewProperties();
 		Scene scene = tvs.createScene(rpL);
 		jfxPanel.setScene(scene);
 

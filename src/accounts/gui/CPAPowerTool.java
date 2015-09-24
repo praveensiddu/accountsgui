@@ -92,7 +92,9 @@ import javax.swing.event.ChangeListener;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.metal.MetalTheme;
 
+import accounts.data.BankAccount;
 import accounts.data.RealProperty;
+import accounts.gui.utils.FileUtils;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
 
@@ -211,21 +213,33 @@ public class CPAPowerTool extends JPanel {
 	}
 
 	private static List<RealProperty> rpL;
+	private static List<BankAccount> baL;
 	/**
 	 * SwingSet2 Main. Called only if we're an application, not an applet.
 	 */
 	public static void main(String[] args) {
 		
-		if (args.length == 0) {
-			System.out.println("requires properties.csv as argument");
+		if (args.length <2) {
+			System.out.println("requires properties.csv bankaccounts.csv as argument");
 			System.exit(-1);
 		}
 		try {
-			rpL = RealPropertiesSwingTable.parsePropFile(args[0]);
+			rpL = FileUtils.parsePropFile(args[0]);
 		} catch (IOException | ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			System.exit(-1);
 		}
+		try {
+			baL = FileUtils.parseAccountFile(args[1]);
+		} catch (IOException | ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.exit(-1);
+		}
+		
+		
+		
 		// Create SwingSet on the default monitor
 		UIManager.put("swing.boldMetal", Boolean.FALSE);
 		CPAPowerTool swingset = new CPAPowerTool(GraphicsEnvironment
@@ -265,13 +279,16 @@ public class CPAPowerTool extends JPanel {
 		statusField.setEditable(false);
 		add(statusField, BorderLayout.SOUTH);
 
-		demoPanel = new JPanel();
-		demoPanel.setLayout(new BorderLayout());
-		demoPanel.setBorder(new EtchedBorder());
-		tabbedPane.addTab("Hi There!", demoPanel);
+		
+		JFXPanel bankAccountsJfxPanel = new JFXPanel();
+		TableViewBankAccounts tvBA = new TableViewBankAccounts();
+		Scene sceneStatements = tvBA.createScene(baL);
+		bankAccountsJfxPanel.setScene(sceneStatements);
+		
+		tabbedPane.addTab("Hi There!", bankAccountsJfxPanel);
 		
 		JFXPanel propertiesJfxPanel = new JFXPanel();
-		TableViewSample tvs = new TableViewSample();
+		TableViewProperties tvs = new TableViewProperties();
 		Scene sceneProperties = tvs.createScene(rpL);
 		propertiesJfxPanel.setScene(sceneProperties);
 
@@ -279,13 +296,13 @@ public class CPAPowerTool extends JPanel {
 				propertiesJfxPanel, getString("TabbedPane.properties_tooltip"));
 		
 
-		JFXPanel statementsJfxPanel = new JFXPanel();
-		TableViewSample tvs1 = new TableViewSample();
-		Scene sceneStatements = tvs1.createScene(rpL);
-		statementsJfxPanel.setScene(sceneStatements);
+		
 
+		demoPanel = new JPanel();
+		demoPanel.setLayout(new BorderLayout());
+		demoPanel.setBorder(new EtchedBorder());
 		tabbedPane.addTab(getString("TabbedPane.statements_label"), null,
-				statementsJfxPanel, getString("TabbedPane.statements_tooltip"));
+				demoPanel, getString("TabbedPane.statements_tooltip"));
 		
 
 		JFXPanel taxReportJfxPanel = new JFXPanel();
