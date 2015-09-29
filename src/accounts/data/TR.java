@@ -1,32 +1,33 @@
 package accounts.data;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 
 import accounts.config.BankStatementFormat;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.FloatProperty;
-import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleFloatProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-public abstract class TR
+public class TR
 {
-	private SimpleObjectProperty<Date> date = new SimpleObjectProperty<Date>();
-	private StringProperty description;
-	private StringProperty comment;
-    private FloatProperty debit = new SimpleFloatProperty(-1);
-    private BooleanProperty locked = new SimpleBooleanProperty(false);
-    private BooleanProperty adjusted = new SimpleBooleanProperty(false);
-	private StringProperty incomeType;
-	private StringProperty taxCategory;
-	private StringProperty property;
+    private SimpleObjectProperty<Date> date        = new SimpleObjectProperty<Date>();
+    private StringProperty             description = new SimpleStringProperty("");
+    private StringProperty             comment     = new SimpleStringProperty("");
+    private FloatProperty              debit       = new SimpleFloatProperty(-1);
+    private BooleanProperty            locked      = new SimpleBooleanProperty(false);
+    private BooleanProperty            adjusted    = new SimpleBooleanProperty(false);
+    private StringProperty             incomeType  = new SimpleStringProperty("");
+    private StringProperty             taxCategory = new SimpleStringProperty("");
+    private StringProperty             property    = new SimpleStringProperty("");
 
     public void copyNonPrimaryFields(TR tr)
     {
@@ -36,7 +37,6 @@ public abstract class TR
         setComment(tr.getComment());
         setLocked(tr.isLocked());
     }
-
 
     public String getDescription()
     {
@@ -92,8 +92,6 @@ public abstract class TR
         this.debit.set(debit);
     }
 
-
-
     public String getComment()
     {
         return comment.get();
@@ -101,7 +99,7 @@ public abstract class TR
 
     public void setComment(String comment)
     {
-        this.comment.set(comment);;
+        this.comment.set(comment);
     }
 
     public boolean isLocked()
@@ -126,15 +124,15 @@ public abstract class TR
         this.property.set(property);
     }
 
+    public boolean isAdjusted()
+    {
+        return adjusted.get();
+    }
 
-	public boolean isAdjusted() {
-		return adjusted.get();
-	}
-
-
-	public void setAdjusted(boolean adjusted) {
-		this.adjusted.set(adjusted);
-	}
+    public void setAdjusted(boolean adjusted)
+    {
+        this.adjusted.set(adjusted);
+    }
 
     private static String[] approxCsvCorrection(final String[] fields)
     {
@@ -213,7 +211,7 @@ public abstract class TR
         return new Float(floatStr).floatValue();
     }
 
-    public void importLine(String line) throws IOException
+    public void importLine(String line) throws IOException, ParseException
     {
 
         line = line.toLowerCase().trim();
@@ -228,7 +226,10 @@ public abstract class TR
             throw new IOException("Invalid transaction line" + line);
         }
         // #DATE,DESCRIPTION,DEBIT,COMMENT,ISLOCKED,INCOMETYPE,TAXCATEGORY,PROPERTY
-        setDate(new Date(fields[0]));
+        DateFormat format = new SimpleDateFormat("MM-DD-yyyy", Locale.ENGLISH);
+        Date date = format.parse(fields[0]);
+
+        setDate(date);
         setDescription(fields[1]);
         Float value = getFloatVaue(fields[2].trim());
         setDebit(value);
@@ -363,7 +364,6 @@ public abstract class TR
             throw new IOException("Description is mandatory");
         }
     }
-
 
     @Override
     public String toString()

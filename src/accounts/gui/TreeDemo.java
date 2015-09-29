@@ -78,7 +78,7 @@ public class TreeDemo extends DemoModule {
 		DefaultMutableTreeNode record = null;
 
 		// open tree data
-		URL url = getClass().getResource("/resources/tree.txt");
+		URL url = getClass().getResource("resources/tree.txt");
 
 		try {
 			// convert url to buffered string

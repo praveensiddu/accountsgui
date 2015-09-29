@@ -30,6 +30,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package accounts.gui;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.util.MissingResourceException;
@@ -51,157 +52,171 @@ import javax.swing.border.SoftBevelBorder;
  *
  * @author Jeff Dinkins
  */
-public class DemoModule extends JApplet {
+public class DemoModule extends JApplet
+{
 
-	// The preferred size of the demo
-	private int PREFERRED_WIDTH = 680;
-	private int PREFERRED_HEIGHT = 600;
+    private int PREFERRED_WIDTH  = 680;
+    private int PREFERRED_HEIGHT = 600;
 
-	Border loweredBorder = new CompoundBorder(new SoftBevelBorder(
-			SoftBevelBorder.LOWERED), new EmptyBorder(5, 5, 5, 5));
+    Border loweredBorder = new CompoundBorder(new SoftBevelBorder(SoftBevelBorder.LOWERED), new EmptyBorder(5, 5, 5, 5));
 
-	// Premade convenience dimensions, for use wherever you need 'em.
-	public static Dimension HGAP2 = new Dimension(2, 1);
-	public static Dimension VGAP2 = new Dimension(1, 2);
+    // Premade convenience dimensions, for use wherever you need 'em.
+    public static Dimension HGAP2 = new Dimension(2, 1);
+    public static Dimension VGAP2 = new Dimension(1, 2);
 
-	public static Dimension HGAP5 = new Dimension(5, 1);
-	public static Dimension VGAP5 = new Dimension(1, 5);
+    public static Dimension HGAP5 = new Dimension(5, 1);
+    public static Dimension VGAP5 = new Dimension(1, 5);
 
-	public static Dimension HGAP10 = new Dimension(10, 1);
-	public static Dimension VGAP10 = new Dimension(1, 10);
+    public static Dimension HGAP10 = new Dimension(10, 1);
+    public static Dimension VGAP10 = new Dimension(1, 10);
 
-	public static Dimension HGAP15 = new Dimension(15, 1);
-	public static Dimension VGAP15 = new Dimension(1, 15);
+    public static Dimension HGAP15 = new Dimension(15, 1);
+    public static Dimension VGAP15 = new Dimension(1, 15);
 
-	public static Dimension HGAP20 = new Dimension(20, 1);
-	public static Dimension VGAP20 = new Dimension(1, 20);
+    public static Dimension HGAP20 = new Dimension(20, 1);
+    public static Dimension VGAP20 = new Dimension(1, 20);
 
-	public static Dimension HGAP25 = new Dimension(25, 1);
-	public static Dimension VGAP25 = new Dimension(1, 25);
+    public static Dimension HGAP25 = new Dimension(25, 1);
+    public static Dimension VGAP25 = new Dimension(1, 25);
 
-	public static Dimension HGAP30 = new Dimension(30, 1);
-	public static Dimension VGAP30 = new Dimension(1, 30);
+    public static Dimension HGAP30 = new Dimension(30, 1);
+    public static Dimension VGAP30 = new Dimension(1, 30);
 
-	private JPanel panel = null;
-	private String resourceName = null;
-	private String iconPath = null;
+    private JPanel panel        = null;
+    private String resourceName = null;
+    private String iconPath     = null;
 
-	public DemoModule() {
-		this(null, null);
-	}
+    public DemoModule()
+    {
+        this(null, null);
+    }
 
-	public DemoModule(String resourceName,
-			String iconPath) {
-		UIManager.put("swing.boldMetal", Boolean.FALSE);
-		panel = new JPanel();
-		panel.setLayout(new BorderLayout());
+    public DemoModule(String resourceName, String iconPath)
+    {
+        UIManager.put("swing.boldMetal", Boolean.FALSE);
+        panel = new JPanel();
+        panel.setLayout(new BorderLayout());
 
-		this.resourceName = resourceName;
-		this.iconPath = iconPath;
+        this.resourceName = resourceName;
+        this.iconPath = iconPath;
 
-	}
+    }
 
-	public String getResourceName() {
-		return resourceName;
-	}
+    public String getResourceName()
+    {
+        return resourceName;
+    }
 
-	public JPanel getDemoPanel() {
-		return panel;
-	}
+    public JPanel getDemoPanel()
+    {
+        return panel;
+    }
 
-	
-	/**
-	 * This method returns a string from the demo's resource bundle.
-	 */
-	public String getString(String key) {
-		String value = null;
-		try {
-			value = TextAndMnemonicUtils.getTextAndMnemonicString(key);
-		} catch (MissingResourceException e) {
-			System.out
-					.println("java.util.MissingResourceException: Couldn't find value for: "
-							+ key);
-		}
-		if (value == null) {
-			value = "Could not find resource: " + key + "  ";
-			return "nada";
-		}
-		return value;
-	}
+    /**
+     * This method returns a string from the demo's resource bundle.
+     */
+    public String getString(String key)
+    {
+        String value = null;
+        try
+        {
+            value = TextAndMnemonicUtils.instance().getTextAndMnemonicString(key);
+        } catch (MissingResourceException e)
+        {
+            System.out.println("java.util.MissingResourceException: Couldn't find value for: " + key);
+        }
+        if (value == null)
+        {
+            value = "Could not find resource: " + key + "  ";
+            return "nada";
+        }
+        return value;
+    }
 
+    public char getMnemonic(String key)
+    {
+        return (getString(key)).charAt(0);
+    }
 
-	public char getMnemonic(String key) {
-		return (getString(key)).charAt(0);
-	}
-	public ImageIcon createImageIcon(String filename, String description) {
-		String path = "resources/images/" + filename;
-		return new ImageIcon(getClass().getResource(path));
-	}
-	/*
-	public ImageIcon createImageIcon(String filename, String description) {
-		if (getSwingSet2() != null) {
-			return getSwingSet2().createImageIcon(filename, description);
-		} else {
-			String path = "/resources/images/" + filename;
-			return new ImageIcon(getClass().getResource(path), description);
-		}
-	}
-	*/
+    public ImageIcon createImageIcon(String filename, String description)
+    {
+        String path = "resources/images/" + filename;
+        return new ImageIcon(getClass().getResource(path));
+    }
+    /*
+    public ImageIcon createImageIcon(String filename, String description) {
+    	if (getSwingSet2() != null) {
+    		return getSwingSet2().createImageIcon(filename, description);
+    	} else {
+    		String path = "/resources/images/" + filename;
+    		return new ImageIcon(getClass().getResource(path), description);
+    	}
+    }
+    */
 
-	public String getName() {
-		return getString(getResourceName() + ".name");
-	};
+    @Override
+    public String getName()
+    {
+        return getString(getResourceName() + ".name");
+    };
 
-	public Icon getIcon() {
-		return createImageIcon(iconPath, getResourceName() + ".name");
-	};
+    public Icon getIcon()
+    {
+        return createImageIcon(iconPath, getResourceName() + ".name");
+    };
 
-	public String getToolTip() {
-		return getString(getResourceName() + ".tooltip");
-	};
+    public String getToolTip()
+    {
+        return getString(getResourceName() + ".tooltip");
+    };
 
-	public void mainImpl() {
-		JFrame frame = new JFrame(getName());
-		frame.getContentPane().setLayout(new BorderLayout());
-		frame.getContentPane().add(getDemoPanel(), BorderLayout.CENTER);
-		getDemoPanel().setPreferredSize(
-				new Dimension(PREFERRED_WIDTH, PREFERRED_HEIGHT));
-		frame.pack();
-		frame.show();
-	}
+    public void mainImpl()
+    {
+        JFrame frame = new JFrame(getName());
+        frame.getContentPane().setLayout(new BorderLayout());
+        frame.getContentPane().add(getDemoPanel(), BorderLayout.CENTER);
+        // getDemoPanel().setPreferredSize(new Dimension(PREFERRED_WIDTH, PREFERRED_HEIGHT));
+        frame.pack();
+        frame.show();
+    }
 
-	public JPanel createHorizontalPanel(boolean threeD) {
-		JPanel p = new JPanel();
-		p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
-		p.setAlignmentY(TOP_ALIGNMENT);
-		p.setAlignmentX(LEFT_ALIGNMENT);
-		if (threeD) {
-			p.setBorder(loweredBorder);
-		}
-		return p;
-	}
+    public JPanel createHorizontalPanel(boolean threeD)
+    {
+        JPanel p = new JPanel();
+        p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
+        p.setAlignmentY(TOP_ALIGNMENT);
+        p.setAlignmentX(LEFT_ALIGNMENT);
+        if (threeD)
+        {
+            p.setBorder(loweredBorder);
+        }
+        return p;
+    }
 
-	public JPanel createVerticalPanel(boolean threeD) {
-		JPanel p = new JPanel();
-		p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
-		p.setAlignmentY(TOP_ALIGNMENT);
-		p.setAlignmentX(LEFT_ALIGNMENT);
-		if (threeD) {
-			p.setBorder(loweredBorder);
-		}
-		return p;
-	}
+    public JPanel createVerticalPanel(boolean threeD)
+    {
+        JPanel p = new JPanel();
+        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
+        p.setAlignmentY(TOP_ALIGNMENT);
+        p.setAlignmentX(LEFT_ALIGNMENT);
+        if (threeD)
+        {
+            p.setBorder(loweredBorder);
+        }
+        return p;
+    }
 
-	public static void main(String[] args) {
-		DemoModule demo = new DemoModule();
-		demo.mainImpl();
-	}
+    public static void main(String[] args)
+    {
+        DemoModule demo = new DemoModule();
+        demo.mainImpl();
+    }
 
-	public void init() {
-		getContentPane().setLayout(new BorderLayout());
-		getContentPane().add(getDemoPanel(), BorderLayout.CENTER);
-	}
+    @Override
+    public void init()
+    {
+        getContentPane().setLayout(new BorderLayout());
+        getContentPane().add(getDemoPanel(), BorderLayout.CENTER);
+    }
 
-	void updateDragEnabled(boolean dragEnabled) {
-	}
 }

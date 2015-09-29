@@ -30,6 +30,7 @@
  */
 package accounts.gui;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 import java.util.ResourceBundle;
 
@@ -58,21 +59,27 @@ public class TextAndMnemonicUtils {
 	private static final String LABEL_SUFFIX = ".labelAndMnemonic";
 
 	// Resource bundle for internationalized and accessible text
-	private static ResourceBundle bundle = null;
+	private ResourceBundle bundle = null;
 
 	// Resource properties for the mnemonic key defenition
-	private static Properties properties = null;
+	private Properties properties = null;
+	private static TextAndMnemonicUtils inst ;
 
-	static {
-		bundle = ResourceBundle.getBundle("accounts.gui.resources.swingset");
-		properties = new Properties();
-		try {
-			properties.load(TextAndMnemonicUtils.class
-					.getResourceAsStream("resources/swingset.properties"));
-		} catch (IOException ex) {
-			System.out
-					.println("java.io.IOException: Couldn't load properties from: resources/swingset.properties");
-		}
+
+	public static TextAndMnemonicUtils instance()
+	{
+		return inst;
+	}
+	public static TextAndMnemonicUtils createInstance() throws IOException
+	{
+		inst = new TextAndMnemonicUtils();
+
+		inst.bundle = ResourceBundle.getBundle("accounts.gui.resources.swingset");
+		inst.properties = new Properties();
+			InputStream is = TextAndMnemonicUtils.class
+					.getResourceAsStream("resources/swingset.properties");
+			inst.properties.load(is);
+			return inst;
 	}
 
 	/**
@@ -88,7 +95,7 @@ public class TextAndMnemonicUtils {
 	 *
 	 * Properties class is used to check if a key created for mnemonic exists.
 	 */
-	public static String getTextAndMnemonicString(String key) {
+	public String getTextAndMnemonicString(String key) {
 
 		if (key.endsWith("_label")) {
 			String compositeKey = composeKey(key, 6, LABEL_SUFFIX);
@@ -128,7 +135,7 @@ public class TextAndMnemonicUtils {
 	 *
 	 * For example the string "&Look && Feel" is converted to "Look & Feel"
 	 */
-	public static String getTextFromTextAndMnemonic(String text) {
+	public String getTextFromTextAndMnemonic(String text) {
 
 		StringBuilder sb = new StringBuilder();
 
@@ -164,7 +171,7 @@ public class TextAndMnemonicUtils {
 	 *
 	 * For example the string "&Look && Feel" is converted to "L"
 	 */
-	public static String getMnemonicFromTextAndMnemonic(String text) {
+	public String getMnemonicFromTextAndMnemonic(String text) {
 		int len = text.length();
 		int index = text.indexOf('&');
 
@@ -184,7 +191,7 @@ public class TextAndMnemonicUtils {
 	/**
 	 * Removes the last n characters and adds the suffix
 	 */
-	private static String composeKey(String key, int reduce, String sufix) {
+	private String composeKey(String key, int reduce, String sufix) {
 		return key.substring(0, key.length() - reduce) + sufix;
 	}
 }
