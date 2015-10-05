@@ -55,7 +55,7 @@ import javax.swing.border.SoftBevelBorder;
 public class DemoModule extends JApplet
 {
 
-    private int PREFERRED_WIDTH  = 680;
+    private int PREFERRED_WIDTH  = 1500;
     private int PREFERRED_HEIGHT = 600;
 
     Border loweredBorder = new CompoundBorder(new SoftBevelBorder(SoftBevelBorder.LOWERED), new EmptyBorder(5, 5, 5, 5));

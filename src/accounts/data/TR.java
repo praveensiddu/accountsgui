@@ -25,13 +25,13 @@ public class TR
     private FloatProperty              debit       = new SimpleFloatProperty(-1);
     private BooleanProperty            locked      = new SimpleBooleanProperty(false);
     private BooleanProperty            adjusted    = new SimpleBooleanProperty(false);
-    private StringProperty             incomeType  = new SimpleStringProperty("");
+    private StringProperty             trType      = new SimpleStringProperty("");
     private StringProperty             taxCategory = new SimpleStringProperty("");
     private StringProperty             property    = new SimpleStringProperty("");
 
     public void copyNonPrimaryFields(TR tr)
     {
-        setIncomeType(tr.getIncomeType());
+        setTrType(tr.getTrType());
         setTaxCategory(tr.getTaxCategory());
         setProperty(tr.getProperty());
         setComment(tr.getComment());
@@ -48,16 +48,16 @@ public class TR
         this.description.set(description);
     }
 
-    public String getIncomeType()
+    public String getTrType()
     {
-        return incomeType.get();
+        return trType.get();
     }
 
-    public void setIncomeType(final String incomeType)
+    public void setTrType(final String trType)
     {
-        if (incomeType == null)
+        if (trType == null)
             return;
-        this.incomeType.set(incomeType.trim().toLowerCase());
+        this.trType.set(trType.trim().toLowerCase());
     }
 
     public String getTaxCategory()
@@ -79,6 +79,7 @@ public class TR
 
     public void setDate(final Date date)
     {
+        System.out.println(date);
         this.date.set(date);
     }
 
@@ -219,14 +220,15 @@ public class TR
         {
             throw new IOException("Empty transaction");
         }
-        String[] fields = line.split(",");
+        String[] fields = line.split(",", -1);
         fields = approxCsvCorrection(fields);
         if (fields.length != 8)
         {
-            throw new IOException("Invalid transaction line" + line);
+            throw new IOException("Invalid transaction line" + line + "\nExpected 8 fields. Found=" + fields.length);
         }
-        // #DATE,DESCRIPTION,DEBIT,COMMENT,ISLOCKED,INCOMETYPE,TAXCATEGORY,PROPERTY
-        DateFormat format = new SimpleDateFormat("MM-DD-yyyy", Locale.ENGLISH);
+        // #DATE,DESCRIPTION,DEBIT,COMMENT,ISLOCKED,TRTYPE,TAXCATEGORY,PROPERTY
+        DateFormat format = new SimpleDateFormat("MM-dd-yyyy", Locale.ENGLISH);
+        System.out.println(fields[0]);
         Date date = format.parse(fields[0]);
 
         setDate(date);
@@ -253,7 +255,7 @@ public class TR
             tempStr = tempStr.toLowerCase().trim();
         if (!"null".equals(tempStr))
         {
-            setIncomeType(tempStr);
+            setTrType(tempStr);
         }
 
         tempStr = fields[6];
@@ -273,14 +275,14 @@ public class TR
         }
     }
 
-    public void init(String line, final BankStatementFormat bc) throws IOException
+    public void init(String line, final BankStatementFormat bc) throws IOException, ParseException
     {
         line = line.toLowerCase().trim();
         if (line.isEmpty())
         {
             throw new IOException("Empty transaction");
         }
-        String[] fields = line.split(",");
+        String[] fields = line.split(",", -1);
         fields = approxCsvCorrection(fields);
 
         if (fields.length <= bc.getDateIndex())
@@ -291,7 +293,12 @@ public class TR
         {
             fields[i] = trimQuote(fields[i]);
         }
-        setDate(new Date(fields[bc.getDateIndex()]));
+
+        DateFormat format = new SimpleDateFormat("MM-dd-yyyy", Locale.ENGLISH);
+        Date date = format.parse(fields[bc.getDateIndex()]);
+
+        setDate(date);
+
         if (fields.length > bc.getDescIndex())
         {
             setDescription(fields[bc.getDescIndex()]);
@@ -371,7 +378,7 @@ public class TR
         final StringBuffer sb = new StringBuffer();
         sb.append(new SimpleDateFormat("MM/dd/yyyy").format(date));
         sb.append(", " + debit);
-        sb.append(", " + incomeType);
+        sb.append(", " + trType);
         sb.append(", " + taxCategory);
         sb.append(", " + property);
         sb.append(", " + description);

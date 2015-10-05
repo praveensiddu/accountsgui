@@ -1,12 +1,15 @@
 package accounts.gui;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 
 import accounts.data.TR;
 import accounts.gui.utils.FileUtils;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -19,6 +22,7 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
@@ -27,6 +31,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import javafx.util.Duration;
 import javafx.util.converter.DefaultStringConverter;
 
 public class TableViewStatement extends Application
@@ -87,6 +92,26 @@ public class TableViewStatement extends Application
 
     }
 
+    public static void hackTooltipStartTiming(Tooltip tooltip)
+    {
+        try
+        {
+            Field fieldBehavior = tooltip.getClass().getDeclaredField("BEHAVIOR");
+            fieldBehavior.setAccessible(true);
+            Object objBehavior = fieldBehavior.get(tooltip);
+
+            Field fieldTimer = objBehavior.getClass().getDeclaredField("activationTimer");
+            fieldTimer.setAccessible(true);
+            Timeline objTimer = (Timeline) fieldTimer.get(objBehavior);
+
+            objTimer.getKeyFrames().clear();
+            objTimer.getKeyFrames().add(new KeyFrame(new Duration(150)));
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
     public Scene createScene()
     {
         data = FXCollections.observableArrayList(trL);
@@ -123,8 +148,10 @@ public class TableViewStatement extends Application
         };
 
         table.setEditable(true);
-        table.setMaxWidth(950);
+        table.setPrefWidth(1500);
+        table.setMaxWidth(1500);
         table.setMinWidth(750);
+        table.getSelectionModel().setCellSelectionEnabled(true);
 
         TableColumn<TR, Date> dateCol = new TableColumn<>("Date");
         dateCol.setMinWidth(50);
@@ -140,7 +167,7 @@ public class TableViewStatement extends Application
         });
 
         TableColumn<TR, String> descriptionCol = new TableColumn<>("Description");
-        descriptionCol.setMinWidth(150);
+        descriptionCol.setMinWidth(400);
         descriptionCol.setCellValueFactory(new PropertyValueFactory<>("description"));
         descriptionCol.setCellFactory(TextFieldTableCell.forTableColumn());
         descriptionCol.setOnEditCommit(new EventHandler<CellEditEvent<TR, String>>()
@@ -187,16 +214,24 @@ public class TableViewStatement extends Application
             }
         });
 
-        TableColumn<TR, String> incomeTypeCol = new TableColumn<>("Income Type");
-        incomeTypeCol.setMinWidth(150);
-        incomeTypeCol.setCellValueFactory(new PropertyValueFactory<>("incomeType"));
-        incomeTypeCol.setCellFactory(TextFieldTableCell.forTableColumn());
-        incomeTypeCol.setOnEditCommit(new EventHandler<CellEditEvent<TR, String>>()
+        TableColumn<TR, String> trTypeCol = new TableColumn<>();
+
+        Label trTypeLabel = new Label("Transaction Type");
+        Tooltip trTypeTT = new Tooltip(
+                "rent/commissions/insurance/professionalfees/mortgageinterest/repairs/tax/utilities/depreciation/hoa/profit/bankfees");
+        hackTooltipStartTiming(trTypeTT);
+        trTypeLabel.setTooltip(trTypeTT);
+        trTypeCol.setGraphic(trTypeLabel);
+
+        trTypeCol.setMinWidth(150);
+        trTypeCol.setCellValueFactory(new PropertyValueFactory<>("trType"));
+        trTypeCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        trTypeCol.setOnEditCommit(new EventHandler<CellEditEvent<TR, String>>()
         {
             @Override
             public void handle(CellEditEvent<TR, String> t)
             {
-                t.getTableView().getItems().get(t.getTablePosition().getRow()).setIncomeType(t.getNewValue());
+                t.getTableView().getItems().get(t.getTablePosition().getRow()).setTrType(t.getNewValue());
             }
         });
 
@@ -231,7 +266,7 @@ public class TableViewStatement extends Application
         });
 
         table.setItems(data);
-        table.getColumns().addAll(dateCol, descriptionCol, commentCol, debitCol, incomeTypeCol, taxCategoryCol, propertyCol);
+        table.getColumns().addAll(dateCol, descriptionCol, commentCol, debitCol, trTypeCol, taxCategoryCol, propertyCol);
 
         /*
         final TextField addFirstName = new TextField();
@@ -277,7 +312,7 @@ public class TableViewStatement extends Application
     {
         Scene scene = createScene();
         stage.setTitle("Table View Sample");
-        stage.setWidth(950);
+        stage.setWidth(1500);
         stage.setHeight(550);
 
         stage.setScene(scene);

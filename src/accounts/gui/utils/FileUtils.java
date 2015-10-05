@@ -134,7 +134,7 @@ public class FileUtils
                 {
                     continue;
                 }
-                String[] fields = line.split(",");
+                String[] fields = line.split(",", -1);
                 if (fields.length != 7)
                 {
                     throw new IOException("Invalid property line=" + line);

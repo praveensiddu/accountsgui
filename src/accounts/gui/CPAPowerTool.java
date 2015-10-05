@@ -51,11 +51,22 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.DirectoryIteratorException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.MissingResourceException;
+import java.util.TreeMap;
 import java.util.Vector;
 
 import javax.swing.AbstractAction;
@@ -91,6 +102,18 @@ import javax.swing.event.ChangeListener;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.metal.MetalTheme;
 
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.DataValidation;
+import org.apache.poi.ss.usermodel.DataValidationConstraint;
+import org.apache.poi.ss.usermodel.DataValidationHelper;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.ss.util.CellRangeAddressList;
+import org.apache.poi.xssf.usermodel.XSSFDataValidationHelper;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 import accounts.data.BankAccount;
 import accounts.data.RealProperty;
 import accounts.data.TR;
@@ -98,11 +121,6 @@ import accounts.gui.utils.FileUtils;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
 
-/**
- * A demo that shows all of the Swing components.
- *
- * @author Jeff Dinkins
- */
 public class CPAPowerTool extends JPanel
 {
 
@@ -125,7 +143,7 @@ public class CPAPowerTool extends JPanel
     private static String currentLookAndFeel = windows;
 
     // The preferred size of the demo
-    private static final int PREFERRED_WIDTH  = 1200;
+    private static final int PREFERRED_WIDTH  = 1550;
     private static final int PREFERRED_HEIGHT = 640;
 
     // Box spacers
@@ -212,7 +230,201 @@ public class CPAPowerTool extends JPanel
 
     private static List<RealProperty> rpL;
     private static List<BankAccount>  baL;
-    private static List<TR>           trL;
+
+    private static Map<String, List<TR>> trMap = new TreeMap<>();
+
+    public static Map<String, List<TR>> getBankTransactionMap(String dir) throws IOException, ParseException
+    {
+        Map<String, List<TR>> trMap = new TreeMap<>();
+        List<Path> listPath = findExportFiles(dir);
+        int i = 0;
+        for (Path p : listPath)
+        {
+            List<TR> trL = FileUtils.parseTransactions(dir + File.separator + p.toFile().getName());
+            String baName = "";
+            if (p.toFile().getName().toLowerCase().startsWith("export_"))
+            {
+                baName = p.toFile().getName().substring("export_".length(), p.toFile().getName().length() - 4);
+            } else
+            {
+                baName = "Statement" + i++;
+            }
+            trMap.put(baName, trL);
+        }
+        return trMap;
+    }
+
+    public static List<Path> findExportFiles(String dir)
+    {
+        List<Path> listFiles = new ArrayList<>();
+        Path directory = Paths.get(dir);
+        PathMatcher pathMatcher = FileSystems.getDefault().getPathMatcher("glob:export_*.csv");
+        try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(directory, "export_*.csv"))
+        {
+            for (Path file : directoryStream)
+            {
+                if (pathMatcher.matches(file.getFileName()))
+                {
+                    listFiles.add(file.getFileName());
+                }
+            }
+        } catch (IOException | DirectoryIteratorException ex)
+        {
+            ex.printStackTrace();
+        }
+        return listFiles;
+    }
+
+    private static DataValidation getTrTypeValidation(DataValidationHelper validationHelper, int rows)
+    {
+        DataValidationConstraint trTypeConstraint = validationHelper
+                .createExplicitListConstraint(new String[] { "SELECT", "rent", "commissions", "insurance"
+
+                , "professionalfees", "mortgageinterest", "repairs", "tax", "utilities", "depreciation", "hoa", "bankfees",
+                        "ignore" });
+
+        CellRangeAddressList trTypeCellList = new CellRangeAddressList(1, rows + 1, 4, 4);
+        DataValidation trTypeDataValidation = validationHelper.createValidation(trTypeConstraint, trTypeCellList);
+        trTypeDataValidation.setSuppressDropDownArrow(true);
+        trTypeDataValidation.setShowErrorBox(true);
+        trTypeDataValidation.setErrorStyle(DataValidation.ErrorStyle.STOP);
+        // dataValidation.createPromptBox("Title", "Message Text");
+        // dataValidation.setShowPromptBox(true);
+
+        trTypeDataValidation.createErrorBox("Box Title", "Please select");
+
+        return trTypeDataValidation;
+    }
+
+    public static void verify(String outFile)
+    {
+    }
+
+    public static void csvToXLSX(String outFile)
+    {
+        try
+        {
+            XSSFWorkbook workBook = new XSSFWorkbook();
+            CellStyle unlockedCellStyle = workBook.createCellStyle();
+            unlockedCellStyle.setLocked(false);
+            unlockedCellStyle.setVerticalAlignment(CellStyle.VERTICAL_TOP);
+            unlockedCellStyle.setWrapText(true);
+
+            CellStyle wrapAlignCellStyle = workBook.createCellStyle();
+            wrapAlignCellStyle.setWrapText(true);
+            wrapAlignCellStyle.setVerticalAlignment(CellStyle.VERTICAL_TOP);
+            CellStyle topAlignCellStyle = workBook.createCellStyle();
+            topAlignCellStyle.setVerticalAlignment(CellStyle.VERTICAL_TOP);
+
+            for (String baName : trMap.keySet())
+            {
+                XSSFSheet sheet = workBook.createSheet(baName);
+                {
+                    XSSFRow currentRow = sheet.createRow(0);
+
+                    int col = 0;
+                    Cell cell = null;
+                    cell = currentRow.createCell(col++);
+                    cell.setCellValue("Date");
+                    cell = currentRow.createCell(col++);
+                    cell.setCellValue("Description");
+                    cell = currentRow.createCell(col++);
+                    cell.setCellValue("Debit");
+                    cell = currentRow.createCell(col++);
+                    cell.setCellValue("Comment");
+                    cell = currentRow.createCell(col++);
+                    cell.setCellValue("Transaction Type");
+                    cell.setCellStyle(unlockedCellStyle);
+                    cell = currentRow.createCell(col++);
+                    cell.setCellValue("Tax Category");
+                    cell.setCellStyle(unlockedCellStyle);
+                    cell = currentRow.createCell(col++);
+                    cell.setCellValue("Property");
+                    cell.setCellStyle(unlockedCellStyle);
+                }
+
+                CellStyle dateCellStyle = workBook.createCellStyle();
+                dateCellStyle.setDataFormat(workBook.getCreationHelper().createDataFormat().getFormat("MM/dd/yyyy"));
+                dateCellStyle.setVerticalAlignment(CellStyle.VERTICAL_TOP);
+
+                List<TR> trL = trMap.get(baName);
+
+                int RowNum = 0;
+                for (TR tr : trL)
+                {
+                    RowNum++;
+                    XSSFRow currentRow = sheet.createRow(RowNum);
+                    int col = 0;
+                    Cell cell = null;
+                    cell = currentRow.createCell(col++);
+                    cell.setCellType(Cell.CELL_TYPE_NUMERIC);
+                    cell.setCellValue(tr.getDate());
+                    cell.setCellStyle(dateCellStyle);
+
+                    cell = currentRow.createCell(col++);
+                    cell.setCellType(Cell.CELL_TYPE_STRING);
+                    cell.setCellValue(tr.getDescription());
+                    cell.setCellStyle(wrapAlignCellStyle);
+
+                    cell = currentRow.createCell(col++);
+                    cell.setCellType(Cell.CELL_TYPE_NUMERIC);
+                    cell.setCellValue(tr.getDebit());
+                    cell.setCellStyle(topAlignCellStyle);
+
+                    cell = currentRow.createCell(col++);
+                    cell.setCellValue(tr.getComment());
+                    cell.setCellType(Cell.CELL_TYPE_STRING);
+                    cell.setCellStyle(unlockedCellStyle);
+
+                    cell = currentRow.createCell(col++);
+                    cell.setCellValue(tr.getTrType());
+                    cell.setCellStyle(unlockedCellStyle);
+
+                    cell = currentRow.createCell(col++);
+                    cell.setCellValue(tr.getTaxCategory());
+                    cell.setCellStyle(unlockedCellStyle);
+
+                    cell = currentRow.createCell(col++);
+                    cell.setCellValue(tr.getProperty());
+                    cell.setCellStyle(unlockedCellStyle);
+
+                }
+                DataValidationHelper validationHelper = new XSSFDataValidationHelper(sheet);
+                DataValidation trTypeDataValidation = getTrTypeValidation(validationHelper, trL.size());
+
+                sheet.addValidationData(trTypeDataValidation);
+                sheet.setAutoFilter(CellRangeAddress.valueOf("A1:N1"));
+                sheet.lockDeleteColumns(true);
+                sheet.lockDeleteRows(true);
+                // sheet.lockFormatCells(true);
+                // sheet.lockFormatColumns(true);
+                // sheet.lockFormatRows(true);
+                sheet.lockInsertColumns(true);
+                sheet.lockInsertRows(true);
+                sheet.lockAutoFilter(false);
+
+                sheet.setColumnWidth(0, 3000);
+                sheet.setColumnWidth(1, 14000);
+                sheet.setColumnWidth(2, 3000);
+                sheet.setColumnWidth(3, 14000);
+                sheet.setColumnWidth(4, 4000);
+                sheet.setColumnWidth(5, 4000);
+                sheet.setColumnWidth(6, 6000);
+                sheet.protectSheet("password");
+
+                // Locks the whole sheet sheet.enableLocking();
+
+            }
+            workBook.lockStructure();
+            FileOutputStream fileOutputStream = new FileOutputStream(outFile);
+            workBook.write(fileOutputStream);
+            fileOutputStream.close();
+            System.out.println("Created xlsx file.");
+        } catch (Exception ex)
+        {
+            System.out.println(ex.getMessage() + "Exception in try");
+        }
+    }
 
     /**
      * SwingSet2 Main. Called only if we're an application, not an applet.
@@ -220,9 +432,9 @@ public class CPAPowerTool extends JPanel
     public static void main(String[] args)
     {
 
-        if (args.length < 2)
+        if (args.length < 3)
         {
-            System.out.println("requires properties.csv bankaccounts.csv as argument");
+            System.out.println("Usage: properties.csv bankaccounts.csv export_dir");
             System.exit(-1);
         }
         try
@@ -245,7 +457,10 @@ public class CPAPowerTool extends JPanel
         }
         try
         {
-            trL = FileUtils.parseTransactions(args[2]);
+
+            trMap = getBankTransactionMap(args[2]);
+            csvToXLSX(args[2] + File.separator + "export_toExcel.xlsx");
+            verify(args[2] + File.separator + "export_toExcel.xlsx");
         } catch (IOException | ParseException e)
         {
             // TODO Auto-generated catch block
@@ -263,9 +478,10 @@ public class CPAPowerTool extends JPanel
         }
 
         // Create SwingSet on the default monitor
-        UIManager.put("swing.boldMetal", Boolean.FALSE);
+        // UIManager.put("swing.boldMetal", Boolean.FALSE);
+        /*
         CPAPowerTool swingset = new CPAPowerTool(
-                GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration());
+                GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration());*/
 
     }
 
@@ -609,9 +825,8 @@ public class CPAPowerTool extends JPanel
      */
     public void preloadFirstDemo()
     {
-        ArrayList<List<TR>> alt = new ArrayList<List<TR>>();
-        alt.add(trL);
-        AllStatementsTabPane.setListSt(alt);
+
+        AllStatementsTabPane.setMapListTR(trMap);
         AllStatementsTabPane astp = new AllStatementsTabPane();
 
         DemoModule demo = addDemo(new AllStatementsTabPane());
