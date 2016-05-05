@@ -126,16 +126,6 @@ public class CPAPowerTool extends JPanel
 
     String[] demos = { "TabbedPaneDemo", "ToolTipDemo", "TreeDemo" };
 
-    /*
-    void loadDemos() {
-    	for (int i = 0; i < demos.length;) {
-    		loadDemo(demos[i]);
-    		i++;
-    	}
-    }
-    
-    */
-
     // Possible Look & Feels
     private static final String windows = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
 
